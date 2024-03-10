@@ -33,7 +33,7 @@ function convertColor(red, green, blue) {
 // console.log(c.rgb())
 // console.log(c.hex())
 
-// ==== MEMBUAT OBJECT DENGAN CLASS ====
+// ==== MEMBUAT OBJECT DENGAN CONSTRUCTOR FUNCTION ====
 function Color(r, g, b) {
   this.r = r;
   this.g = g;
