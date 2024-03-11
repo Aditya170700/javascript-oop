@@ -69,13 +69,23 @@ class Color {
     this.r = r;
     this.g = g;
     this.b = b;
+    this.h = 0;
+    this.s = 0;
+    this.l = 0;
     this.name = name;
+    this.calcHSL();
   }
 
   formatRGB() {
     const { r, g, b } = this;
 
     return `${r}, ${g}, ${b}`;
+  }
+
+  formatHSL() {
+    const { h, s, l } = this;
+
+    return `${h}, ${s}%, ${l}%`;
   }
 
   colorName() {
@@ -95,11 +105,83 @@ class Color {
   rgba(a = 1.0) {
     return `rgba(${this.formatRGB()}, ${a})`;
   };
+
+  hsl() {
+    return `hsl(${this.formatHSL()})`;
+  };
+
+  hsla(a = 1.0) {
+    return `hsla(${this.formatHSL()}, ${a})`;
+  };
+
+  hslFullSaturated() {
+    const { h, l } = this;
+
+    return `hsl(${h}, 100%, ${l}%)`;
+  };
+
+  hslOpposite() {
+    const { h, s, l } = this;
+    const newHue = (h + 180) % 360;
+
+    return `hsl(${newHue}, ${s}%, ${l}%)`;
+  };
+
+  calcHSL() {
+    let { r, g, b } = this;
+
+    // Make RGB fractions of 1
+    r /= 255;
+    g /= 255;
+    b /= 255;
+
+    // Find greatest and smallest channel values
+    let cmin = Math.min(r, g, b),
+      cmax = Math.max(r, g, b),
+      delta = cmax - cmin,
+      h = 0,
+      s = 0,
+      l = 0;
+
+    if (delta == 0) h = 0;
+    else if (cmax == r)
+      // Red is max
+      h = ((g - b) / delta) % 6;
+    else if (cmax == g)
+      // Green is max
+      h = (b - r) / delta + 2;
+    else
+      // Blue is max
+      h = (r - g) / delta + 4;
+    
+    h = Math.round(h * 60);
+
+    // Make negative hue positive behind 360
+    if (h < 0) h += 360;
+
+    // Calculate lightness
+    l = (cmax + cmin) / 2;
+
+    // Calculate saturation
+    s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+
+    // Multiply l and s by 100
+    s = +(s * 100).toFixed(1);
+    l = +(l * 100).toFixed(1);
+
+    this.h = h;
+    this.s = s;
+    this.l = l;
+  }
 }
 
-let color = new Color(1,2,3,'sky');
+let color = new Color(185, 243, 252, 'sky');
 console.log(color)
 console.log(color.colorName())
 console.log(color.rgb())
 console.log(color.hex())
 console.log(color.rgba(0.3))
+console.log(color.hsl())
+console.log(color.hsla(0.4))
+console.log(color.hslFullSaturated())
+console.log(color.hslOpposite())
